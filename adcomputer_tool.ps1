@@ -36,21 +36,52 @@ else
     exit;
 }
 
-#Check Submitted Action
-if([string]::IsNullOrEmpty($action) -eq $false)
+function set-actDisableComputers()
 {
-    Write-Output $action;
-    
-    #Add Switch Statement to Functions
+    Write-Output "Would've disabled computers";
+    Write-Output $cnfgSettings.AD_Domain;
+
+    #Disable-ADAccount
 }
-else 
+
+function get-actComputerReport()
 {
-    Write-Output "Script requires an action to run. The available choices:";
+    Write-Output "Reporting on systems";
+}
+
+function remove-actComputers()
+{
+    Write-Output "Time to say goodbye";
+}
+
+function get-actInstructions()
+{
     Write-Output " ";
+    Write-Output "Script requires an action to run. The available options:";
+    Write-Output " ";
+    Write-Output "disable";
+    Write-Output "remove";
     Write-Output "report";
-    Write-Output "report <computer_name>";
-    Write-Output "removals";
-    Write-Output "";
+    Write-Output "report-ou"
+    Write-Output " ";
     #Exit Script
     exit;
 }
+
+#Determine Requested Action
+if([string]::IsNullOrEmpty($action) -eq $false)
+{
+    switch($action.ToString().ToLower())
+    {
+        "report" { get-actComputerReport; }
+        "disable" { set-actDisableComputers; }
+        "removals" { remove-actComputers; }
+        default { get-actInstructions; }
+
+    }#End of $action Switch Statement
+}
+else 
+{
+    get-actInstructions;
+}
+
