@@ -11,8 +11,11 @@ param ([Parameter(Position=0)]$action="",
 #Var for Config Settings
 $cnfgSettings = $null;
 
+#Array for Reporting 
+$arrRprting = @();
+
 #Check for Settings File 
-if((Test-Path -Path ./config.json) -eq $true)
+if((Test-Path -Path .\config.json) -eq $true)
 {
     #Import Json Configuration File
     $cnfgSettings =  Get-Content -Raw -Path .\config.json | ConvertFrom-Json;
@@ -36,17 +39,52 @@ else
     exit;
 }
 
+
+#Function for Disabling Computers Listed in the Disable Text File
 function set-actDisableComputers()
 {
-    Write-Output "Would've disabled computers";
-    Write-Output $cnfgSettings.AD_Domain;
+   #Check File Path for Names of Computers to Disable
+   if((Test-Path -Path $cnfgSettings.AD_Computers_To_Disable_Text_File) -eq $true)
+   {
 
-    #Disable-ADAccount
-}
+        foreach($daCmpt in (Get-Content -Path $cnfgSettings.AD_Computers_To_Disable_Text_File))
+        {
+            Write-Output $daCmpt.ToString().Trim();
+        }
 
+   }
+   else 
+   {
+        #Create the File that Doesn't Exist
+        New-Item -Path $cnfgSettings.AD_Computers_To_Disable_Text_File;
+
+        #Notify User
+        Write-Output "Required file not found, so we created it";
+   }
+
+}#End of set-actDisableComputers
+
+#Function for Reporting Computers Listed in the Report Text File
 function get-actComputerReport()
 {
-    Write-Output "Reporting on systems";
+    #Check File Path for Names of Computers to Report
+   if((Test-Path -Path $cnfgSettings.AD_Computers_To_Report_Text_File) -eq $true)
+   {
+        #Loop Through the Reporting File Computer Names
+        foreach($rptCmpt in (Get-Content -Path $cnfgSettings.AD_Computers_To_Report_Text_File))
+        {
+            Get-ADComputer -identity $rptCmpt.ToString().Trim() -Server $cnfgSettings.AD_Domain;
+        }
+
+   }
+   else 
+   {
+        #Create the File that Doesn't Exist
+        New-Item -Path $cnfgSettings.AD_Computers_To_Report_Text_File;
+
+        #Notify User
+        Write-Output "Required file not found, so we created it";
+   }
 }
 
 function remove-actComputers()
