@@ -1,7 +1,7 @@
 <#
     Title: adcomputer_tool.ps1
     Authors: Dean Bunn
-    Last Edit: 2021-12-08
+    Last Edit: 2021-12-14
 #>
 
 #Parameters for the Script Action
@@ -49,7 +49,7 @@ function set-actDisableComputers()
 
         foreach($daCmpt in (Get-Content -Path $cnfgSettings.AD_Computers_To_Disable_Text_File))
         {
-            Write-Output $daCmpt.ToString().Trim();
+            Get-ADComputer -Identity $daCmpt.ToString().Trim() -Server $cnfgSettings.AD_Domain | Set-ADComputer -Enabled $false;
         }
 
    }
